@@ -1,2 +1,2 @@
-# JohnMinecraft
-John plays minecraft.
+# JamesMinecraft
+James plays minecraft.

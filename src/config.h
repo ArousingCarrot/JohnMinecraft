@@ -8,7 +8,7 @@
 #define WINDOW_HEIGHT 768
 #define VSYNC 1
 #define SCROLL_THRESHOLD 0.1
-#define MAX_MESSAGES 4
+#define MAX_MESSAGES 10
 #define DB_PATH "craft.db"
 #define USE_CACHE 1
 #define DAY_LENGTH 600

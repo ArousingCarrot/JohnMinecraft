@@ -1,6 +1,6 @@
-# 🤖 James AI Bot - Complete Setup Guide
+# James AI Bot - Complete Setup Guide
 
-**Your AI companion for Craft! James can chat, follow you, and build structures.**
+Your AI companion for Craft! James can chat, follow you, and build structures.
 
 ---
 
@@ -14,7 +14,7 @@ James is a **fully conversational AI bot** that:
 
 ---
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before starting, make sure you have:
 

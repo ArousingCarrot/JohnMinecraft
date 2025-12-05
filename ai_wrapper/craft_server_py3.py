@@ -84,10 +84,10 @@ class CraftServer:
         server.listen(5)
         
         print("="*60)
-        print("🎮 CRAFT SERVER (Python 3)")
+        print("CRAFT SERVER (Python 3)")
         print("="*60)
-        print(f"📡 Listening on {HOST}:{PORT}")
-        print("✅ Ready for connections!")
+        print(f"Listening on {HOST}:{PORT}")
+        print("Ready for connections!")
         print("="*60 + "\n")
         
         try:

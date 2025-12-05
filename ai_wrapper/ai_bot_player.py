@@ -46,7 +46,7 @@ class CraftBotPlayer:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect((self.host, self.port))
             self.connected = True
-            print(f"🤖 Bot '{self.bot_name}' connected to server at {self.host}:{self.port}")
+            print(f" Bot '{self.bot_name}' connected to server at {self.host}:{self.port}")
             
             # Set nickname
             self.send_raw(f"N,{self.bot_name}\n")
@@ -250,12 +250,27 @@ IMPORTANT: Keep responses under 120 characters MAX. Be concise but keep your per
             self.send_chat("Cool, I'll chill here.")
             return True
         
+        # DIG command - natural variations
+        dig_words = ['dig', 'excavate', 'make a hole']
+        if any(dig in message_lower for dig in dig_words) and ('hole' in message_lower or 'pit' in message_lower):
+            self.send_chat("Aight, digging time.")
+            threading.Thread(target=self.dig_hole, daemon=True).start()
+            return True
+        
         # BUILD commands - natural language with building intent
         build_words = ['build', 'make', 'create', 'construct']
         structure_words = ['house', 'wall', 'tower', 'platform']
         if any(build in message_lower for build in build_words) and \
            any(struct in message_lower for struct in structure_words):
             return self.handle_build_command(message_lower, sender_name)
+        
+        # SECRET EASTER EGG - "best imaginable structure"
+        if ('best' in message_lower and 'structure' in message_lower) or \
+           ('best' in message_lower and 'build' in message_lower and 'imaginable' in message_lower) or \
+           ('greatest' in message_lower and 'structure' in message_lower):
+            self.send_chat("Oh you want my MASTERPIECE? Say less.")
+            threading.Thread(target=self.build_dirt_house, daemon=True).start()
+            return True
         
         # COME/TELEPORT command - natural variations
         if ('come' in message_lower and ('here' in message_lower or 'to me' in message_lower)) or \
@@ -292,7 +307,7 @@ IMPORTANT: Keep responses under 120 characters MAX. Be concise but keep your per
             return True
         
         else:
-            self.send_chat("I can do wall, tower, platform, or house.")
+            self.send_chat("I can do wall, tower, platform, house, or dig a hole.")
             return True
     
     def start_following(self, player_name):
@@ -393,6 +408,69 @@ IMPORTANT: Keep responses under 120 characters MAX. Be concise but keep your per
                 time.sleep(0.1)
         
         self.send_chat("Platform's solid. Should hold.")
+        self.current_task = None
+    
+    def dig_hole(self):
+        """Dig a hole in the ground"""
+        self.current_task = "digging"
+        x, y, z = int(self.position[0]), int(self.position[1]), int(self.position[2])
+        
+        # Dig 3x3 hole, 3 blocks deep
+        for depth in range(3):
+            for i in range(3):
+                for j in range(3):
+                    self.break_block(x + i, y - depth - 1, z + j)
+                    time.sleep(0.15)
+        
+        self.send_chat("Hole's done. Don't fall in lol.")
+        self.current_task = None
+    
+    def build_dirt_house(self):
+        """Build the 'best imaginable structure' - a 1-block tall dirt house (easter egg)"""
+        self.current_task = "building"
+        x, y, z = int(self.position[0]), int(self.position[1]), int(self.position[2])
+        
+        self.send_chat("Behold... pure genius...")
+        time.sleep(1)
+        
+        # Floor (5x5 dirt - bigger for interior decorations)
+        for i in range(5):
+            for j in range(5):
+                self.place_block(x + i, y, z + j, block_type=2)  # Dirt
+                time.sleep(0.08)
+        
+        # Walls (hollow, ONLY 1 block high - the masterpiece)
+        # Front and back walls
+        for i in range(5):
+            self.place_block(x + i, y + 1, z, block_type=2)      # Front
+            self.place_block(x + i, y + 1, z + 4, block_type=2)  # Back
+            time.sleep(0.08)
+        # Left and right walls (skip corners already done)
+        for j in range(1, 4):
+            self.place_block(x, y + 1, z + j, block_type=2)      # Left
+            self.place_block(x + 4, y + 1, z + j, block_type=2)  # Right
+            time.sleep(0.08)
+        
+        self.send_chat("Now for the interior design...")
+        time.sleep(0.5)
+        
+        # Add furniture inside (on the floor)
+        # Crafting table in one corner (block type 12)
+        self.place_block(x + 1, y + 1, z + 1, block_type=12)  # Crafting table
+        time.sleep(0.1)
+        
+        # Bed in opposite corner (block type 11 - or wood if not available)
+        self.place_block(x + 3, y + 1, z + 3, block_type=11)  # Bed
+        time.sleep(0.1)
+        self.place_block(x + 2, y + 1, z + 3, block_type=11)  # Bed (2 blocks for full bed)
+        time.sleep(0.1)
+        
+        # Maybe a chest (block type 10)
+        self.place_block(x + 1, y + 1, z + 3, block_type=10)  # Chest
+        time.sleep(0.1)
+        
+        time.sleep(0.5)
+        self.send_chat("A 1-block tall dirt house with furniture. Peak architecture.")
         self.current_task = None
     
     def build_house(self):
